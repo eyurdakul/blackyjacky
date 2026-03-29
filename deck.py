@@ -24,7 +24,7 @@ class Deck:
 
     def __create_cards(self):
         for suit in Suits:
-            for rank, value in self.ranks:
+            for rank, value in self.ranks.items():
                 self.__cards.append(Card(suit, rank, value))
         random.shuffle(self.__cards)
     

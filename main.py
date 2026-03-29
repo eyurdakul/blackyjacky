@@ -16,6 +16,8 @@ class BlackjackGame:
         self.state = GameState.MENU
         self.sound = Mixer(pygame.mixer)
         self.deck = Deck()
+        self.__player_score = 0
+        self.__dealer_score = 0
         self.__initiate_positions()
         self.__initiate_buttons()
         self.__initiate_title()
