@@ -5,6 +5,7 @@ from settings import *
 from mixer import Mixer
 from button import Button
 from deck import Deck
+from card_renderer import CardRenderer
 
 class BlackjackGame:
     def __init__(self):
@@ -16,7 +17,10 @@ class BlackjackGame:
         self.state = GameState.MENU
         self.sound = Mixer(pygame.mixer)
         self.deck = Deck()
+        self.card_renderer = CardRenderer()
         self.__top_score = 21
+        self.player_cards = []
+        self.dealer_cards = []
         self.__initiate_positions()
         self.__initiate_buttons()
         self.__initiate_title()
@@ -64,6 +68,17 @@ class BlackjackGame:
             self.hit_button.draw(self.screen)
             self.back_button.draw(self.screen)
             self.stand_button.draw(self.screen)
+
+            for i, card in enumerate(self.player_cards):
+                x = self.center_x + i * 30
+                y = 400
+                self.card_renderer.draw_card(self.screen, card, x, y)
+
+            for i, card in enumerate(self.dealer_cards):
+                x = self.center_x + i * 30
+                y = 100
+                self.card_renderer.draw_card(self.screen, card, x, y)
+    
         if (self.state == GameState.YOU_LOSE or self.state == GameState.YOU_WIN):
             self.quit_button.draw(self.screen)
             self.start_button.draw(self.screen)
@@ -89,18 +104,25 @@ class BlackjackGame:
     def __start_game(self):
         self.__player_score = 0
         self.__dealer_score = 0
+        self.player_cards = []
+        self.dealer_cards = []
         self.sound.play(SoundLibrary.SHUFFLE)
         self.__deal_cards(True)
 
     def __deal_cards(self, hit):
         dealer = self.deck.give_a_card()
+        self.dealer_cards.append(dealer)
         self.__dealer_score += dealer.value
-        if hit and not self.__dealer_score >= self.__top_score:
+
+        if hit and self.__dealer_score < self.__top_score:
             player = self.deck.give_a_card()
+            self.player_cards.append(player)
             self.__player_score += player.value
+
         if self.__dealer_score > self.__top_score or self.__player_score == self.__top_score:
             self.sound.play(SoundLibrary.WIN)
             self.state = GameState.YOU_WIN
+
         elif self.__player_score > self.__top_score or self.__dealer_score == self.__top_score:
             self.sound.play(SoundLibrary.LOSE)
             self.state = GameState.YOU_LOSE
