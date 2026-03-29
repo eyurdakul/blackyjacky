@@ -20,3 +20,9 @@ class SoundLibrary(Enum):
     LOSE = 4
     CLICK = 5
     SHUFFLE = 6
+
+class Suits(Enum):
+    HEARTS = 1
+    DIAMONDS = 2
+    CLUBS = 3
+    SPADES = 4

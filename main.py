@@ -4,6 +4,7 @@ from enums import *
 from settings import *
 from mixer import Mixer
 from button import Button
+from deck import Deck
 
 class BlackjackGame:
     def __init__(self):
@@ -14,6 +15,7 @@ class BlackjackGame:
         self.clock = pygame.time.Clock()
         self.state = GameState.MENU
         self.sound = Mixer(pygame.mixer)
+        self.deck = Deck()
         self.__initiate_positions()
         self.__initiate_buttons()
         self.__initiate_title()
@@ -69,6 +71,7 @@ class BlackjackGame:
         if action == ButtonType.START:
             self.sound.play(SoundLibrary.CLICK)
             self.state = GameState.PLAYING
+            self.__start_game()
         if action == ButtonType.BACK:
             self.sound.play(SoundLibrary.CLICK)
             self.state = GameState.MENU
@@ -76,6 +79,9 @@ class BlackjackGame:
             self.sound.play(SoundLibrary.CHIP)
         if action == ButtonType.STAND:
             self.sound.play(SoundLibrary.CHIP)
+
+    def __start_game(self):
+        self.sound.play(SoundLibrary.SHUFFLE)
 
     def __handle_events(self):
         for event in pygame.event.get():
