@@ -16,8 +16,7 @@ class BlackjackGame:
         self.state = GameState.MENU
         self.sound = Mixer(pygame.mixer)
         self.deck = Deck()
-        self.__player_score = 0
-        self.__dealer_score = 0
+        self.__top_score = 21
         self.__initiate_positions()
         self.__initiate_buttons()
         self.__initiate_title()
@@ -65,6 +64,9 @@ class BlackjackGame:
             self.hit_button.draw(self.screen)
             self.back_button.draw(self.screen)
             self.stand_button.draw(self.screen)
+        if (self.state == GameState.YOU_LOSE or self.state == GameState.YOU_WIN):
+            self.quit_button.draw(self.screen)
+            self.start_button.draw(self.screen)
 
     def __handle_action(self, action):
         if action == ButtonType.QUIT:
@@ -79,17 +81,35 @@ class BlackjackGame:
             self.state = GameState.MENU
         if action == ButtonType.HIT:
             self.sound.play(SoundLibrary.CHIP)
+            self.__deal_cards(True)
         if action == ButtonType.STAND:
+            self.__deal_cards(False)
             self.sound.play(SoundLibrary.CHIP)
 
     def __start_game(self):
+        self.__player_score = 0
+        self.__dealer_score = 0
         self.sound.play(SoundLibrary.SHUFFLE)
+        self.__deal_cards(True)
+
+    def __deal_cards(self, hit):
+        dealer = self.deck.give_a_card()
+        self.__dealer_score += dealer.value
+        if hit and not self.__dealer_score >= self.__top_score:
+            player = self.deck.give_a_card()
+            self.__player_score += player.value
+        if self.__dealer_score > self.__top_score or self.__player_score == self.__top_score:
+            self.sound.play(SoundLibrary.WIN)
+            self.state = GameState.YOU_WIN
+        elif self.__player_score > self.__top_score or self.__dealer_score == self.__top_score:
+            self.sound.play(SoundLibrary.LOSE)
+            self.state = GameState.YOU_LOSE
 
     def __handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            if self.state == GameState.MENU:
+            if self.state == GameState.MENU or self.state == GameState.YOU_LOSE or self.state == GameState.YOU_WIN:
                 self.__handle_action(self.start_button.handle_event(event))
                 self.__handle_action(self.quit_button.handle_event(event))
                 
